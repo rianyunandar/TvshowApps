@@ -1,6 +1,6 @@
 import React from 'react'
 import {Switch , Route} from "react-router-dom"
-import  Home  from './views/Home';
+import  {Home}  from './views/Home';
 import Show from './views/Show';
 
 const Routes = () => {
