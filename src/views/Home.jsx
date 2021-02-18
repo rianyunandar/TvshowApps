@@ -47,17 +47,24 @@ async componentDidMount(){
                       return(
                     <Carousel.Item key={i} interval={5000}>
                             <img
-                                className="d-block w-100"
+                                className="d-block w-100 CarauselBackground rounded"
+                                src={item.image.medium}
+                                alt={item.name}
+                            />
+                              <img
+                                className=" CarauselImage rounded"
                                 src={item.image.medium}
                                 alt={item.name}
                             />
                             <Carousel.Caption>
-                                <h3>{item.name}</h3>
+                                <div className="CarauselTitle"><h3>{item.name}</h3></div>
+                                <div className="CarauselBox">
                                 <p>
                                     {item.genres.map((genre, id)=>{
                                         return <span key={id}> {genre} </span>
                                     })}
                                 </p>
+                                </div>
                             </Carousel.Caption>
                     </Carousel.Item>
                       )
