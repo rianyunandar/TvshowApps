@@ -15,7 +15,7 @@ const header = () => {
           <LinkContainer to="/">
             <Nav.Link ><i className="fas fa-home"></i>Home </Nav.Link>
             </LinkContainer>
-            <LinkContainer to="/show">
+            <LinkContainer to="/shows">
             <Nav.Link > <i className="fas fa-tv"></i> Show </Nav.Link>
             </LinkContainer>
             <Nav.Link > <i className="fas fa-user"></i> Login  </Nav.Link>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Col, Container, Row,Button } from "react-bootstrap";
 import axios from "axios";
 import ReactPaginate from "react-paginate";
-import TVCard from "./../components/TVCard";
+import TVCard from "./../components/TVShow/TVCard";
 
 const Show = () => {
   const [data, setData] = useState([]);

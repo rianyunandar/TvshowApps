@@ -194,3 +194,4 @@ handlePageClick = (e) => {
     )
   }
 }
+export default Home;
