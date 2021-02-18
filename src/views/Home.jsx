@@ -1,11 +1,15 @@
 import React, { Component } from "react";
-import { Col, Container, Row, Carousel } from "react-bootstrap";
+import { Col, Container, Row, Carousel,Media } from "react-bootstrap";
 import axios from "axios"
 export class Home extends Component {
 constructor(props){
     super(props);
     this.state={
         dataCarausel:[],
+        dataSchedule:[],
+        perPage:6,
+        currentpage:0,
+        offset:0,
         loading:true 
     }
 }
@@ -16,13 +20,30 @@ async dataHandler(){
         .then(async (res)=>{
 
             let res1=res.data;
-            let sliceRes1=res1.slice(0,4)
+            let sliceRes1=res1.slice(0,this.state.perPage)
             this.setState({
                 dataCarausel:sliceRes1,
-                loading:false 
+                
             })
 
         })
+
+      
+            await axios.get(`https://api.tvmaze.com/schedule`,{crossDomain:true})
+            .then(async (res)=>{
+    
+                let res1=res.data;
+                
+                this.setState({
+                    dataSchedule:res1,
+                    loading:false 
+                })
+    
+            })
+
+
+
+
  }
  catch(error){
      alert(JSON.stringify(error.message))
@@ -35,11 +56,12 @@ async componentDidMount(){
 
 
   render() {
-    //   console.log(this.state.dataCarausel)
+    console.log(this.state.dataSchedule)
     return (
       <>
         <Container>
             {this.state.loading ? (<h1>Loading...</h1>) : (
+                <>
           <Row>
             <Col>
               <Carousel>
@@ -72,7 +94,36 @@ async componentDidMount(){
                 
               </Carousel>
             </Col>
-          </Row>)}
+          </Row>
+
+        <Row>
+        <ul className="list-unstyled">
+        {this.state.dataSchedule.map((item , i )=>{
+        return(
+            <Media key={i} as="li">
+                <img
+                width={64}
+                height={64}
+                className="mr-3"
+                src={item.show.image? item.show.image.medium : "https://picsum.photos/200"}
+                alt={item.name}
+                />
+                <Media.Body>
+                <h5>{item.show.type} <i className="far fa-clock"></i>  {item.airdate}  {item.airtime}</h5>
+                
+                <div dangerouslySetInnerHTML={{__html:item.show.summary}}></div>
+                
+                </Media.Body>
+            </Media>
+        
+        )})}
+            </ul>
+        </Row>
+          </> 
+          
+          )}
+
+          
         </Container>
       </>
     )
