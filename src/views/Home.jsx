@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Col, Container, Row, Carousel,Media } from "react-bootstrap";
 import axios from "axios"
+import ReactPaginate from "react-paginate"
 export class Home extends Component {
 constructor(props){
     super(props);
@@ -8,7 +9,7 @@ constructor(props){
         dataCarausel:[],
         dataSchedule:[],
         perPage:6,
-        currentpage:0,
+        currentPage:0,
         offset:0,
         loading:true 
     }
@@ -19,8 +20,14 @@ async dataHandler(){
         await axios.get(`https://api.tvmaze.com/shows`,{crossDomain:true})
         .then(async (res)=>{
 
-            let res1=res.data;
-            let sliceRes1=res1.slice(0,this.state.perPage)
+            let sorted= res.data.sort(function (a,b){
+                return a.rating.average < b.rating.average 
+                ? 1
+                : b.rating.average < a.rating.average 
+                ? -1 
+                :0;
+            })
+            let sliceRes1=sorted.slice(0,this.state.perPage)
             this.setState({
                 dataCarausel:sliceRes1,
                 
@@ -33,9 +40,10 @@ async dataHandler(){
             .then(async (res)=>{
     
                 let res1=res.data;
+                let sliceJson = res1.slice(this.state.offset, this.state.offset + this.state.perPage)
                 
                 this.setState({
-                    dataSchedule:res1,
+                    dataSchedule:sliceJson,
                     loading:false 
                 })
     
@@ -49,14 +57,52 @@ async dataHandler(){
      alert(JSON.stringify(error.message))
  }
 }
+async dataHandler2(){
+    try{
+                   
+               await axios.get(`https://api.tvmaze.com/schedule`,{crossDomain:true})
+               .then(async (res)=>{
+       
+                   let res1=res.data;
+                   let sliceJson = res1.slice(this.state.offset, this.state.offset + this.state.perPage)
+                   
+                   this.setState({
+                       dataSchedule:sliceJson,
+                       loading:false 
+                   })
+       
+               })
+   
+   
+   
+   
+    }
+    catch(error){
+        alert(JSON.stringify(error.message))
+    }
+   }
 
 async componentDidMount(){
     this.dataHandler();
+    this.dataHandler2();
 }
 
+handlePageClick = (e) => {
+    let selected = e.selected;
+    let offset = Math.ceil(selected * this.state.perPage);
+
+    this.setState({
+        currentPage: selected,
+        offset:offset
+     },()=>{
+        this.dataHandler2();
+     }
+     
+     )
+  };
 
   render() {
-    console.log(this.state.dataSchedule)
+    console.log(this.state.dataCarausel)
     return (
       <>
         <Container>
@@ -78,6 +124,10 @@ async componentDidMount(){
                                 src={item.image.medium}
                                 alt={item.name}
                             />
+                            <div className="CarauselHeader">
+                                <h5>Best TV Show</h5>
+                            </div>
+
                             <Carousel.Caption>
                                 <div className="CarauselTitle"><h3>{item.name}</h3></div>
                                 <div className="CarauselBox">
@@ -95,7 +145,7 @@ async componentDidMount(){
               </Carousel>
             </Col>
           </Row>
-
+        <h3 className="scheduleHeader">TV Show Today</h3>
         <Row>
         <ul className="list-unstyled">
         {this.state.dataSchedule.map((item , i )=>{
@@ -109,7 +159,7 @@ async componentDidMount(){
                 alt={item.name}
                 />
                 <Media.Body>
-                <h5>{item.show.type} <i className="far fa-clock"></i>  {item.airdate}  {item.airtime}</h5>
+                <h5>{item.show.type} <i className="far fa-clock"></i>  {item.airdate}  {item.airtime}  On {item.show.network? item.show.network.name : "TV"} Channel</h5>
                 
                 <div dangerouslySetInnerHTML={{__html:item.show.summary}}></div>
                 
@@ -119,6 +169,21 @@ async componentDidMount(){
         )})}
             </ul>
         </Row>
+        <ReactPaginate
+          previousLabel={'previous'}
+          nextLabel={'next'}
+          breakLabel={'...'}
+          breakClassName={'break-me'}
+          pageCount={this.state.pageCount}
+          marginPagesDisplayed={2}
+          pageRangeDisplayed={5}
+          onPageChange={this.handlePageClick}
+          containerClassName={'pagination'}
+          subContainerClassName={'pages pagination'}
+          activeClassName={'active'}
+        />
+        
+
           </> 
           
           )}
